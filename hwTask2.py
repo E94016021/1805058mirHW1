@@ -1,6 +1,7 @@
 import numpy as np
 import librosa.feature
 import librosa
+import time
 
 from concurrent.futures import ProcessPoolExecutor
 from dataLoader import Data
@@ -54,14 +55,12 @@ def run_q2(genre, gamma):
     d = Data(genre)
     counter = 0  # Parallelization of the load file process
     with ProcessPoolExecutor(max_workers=4) as executor:
-        print("gamma =", gamma)
         for au, sr, key in executor.map(d.__getitem__, range(d.len)):
             key_pred = ks_match_key(au, sr, gamma)
             if key == key_pred:
                 counter += 1
     acc = counter / d.len
     accs.append(acc)
-
 
 
 def ks_match_key(au, sr, gamma):
@@ -136,12 +135,14 @@ def q3_score(ans, preds):
 
 
 if __name__ == "__main__":
+    ts = time.time()
     print("start")
+
     genres = ['pop', 'blues', 'metal', 'rock', 'hiphop']
     questions = ['q1', 'q2', 'q3']
     gammas = [1, 10, 100, 1000]
-    accs = []
 
+    accs = []
     for genre in genres:
         run(genre, 'q1')
         mix = list(zip(genres, accs))
@@ -149,21 +150,35 @@ if __name__ == "__main__":
     print(mix)
 
     for gamma in gammas:
+        accs = []
         for genre in genres:
             run_q2(genre, gamma)
             mix = list(zip(genres, accs))
         print("q2 & gamma =", gamma)
         print(mix)
 
+    accs = []
     for genre in genres:
         run(genre, 'q3')
         mix = list(zip(genres, accs))
     print("q3 ")
     print(mix)
 
-"""
-result:
+    te = time.time()
+    print("cost %  sec" % (te - ts))
 
-[('pop', 0.16), ('blues', 0.07), ('metal', 0.05), ('rock', 0.17), ('hiphop', 0.01)]
+"""
+q1 
+[('pop', 0.43), ('blues', 0.22), ('metal', 0.22), ('rock', 0.3), ('hiphop', 0.12)]
+q2 & gamma = 1
+[('pop', 0.45), ('blues', 0.27), ('metal', 0.25), ('rock', 0.37), ('hiphop', 0.11)]
+q2 & gamma = 10
+[('pop', 0.44), ('blues', 0.25), ('metal', 0.23), ('rock', 0.35), ('hiphop', 0.12)]
+q2 & gamma = 100
+[('pop', 0.43), ('blues', 0.22), ('metal', 0.22), ('rock', 0.3), ('hiphop', 0.12)]
+q2 & gamma = 1000
+[('pop', 0.43), ('blues', 0.21), ('metal', 0.2), ('rock', 0.29), ('hiphop', 0.12)]
+q3 
+[('pop', 0.498), ('blues', 0.248), ('metal', 0.273), ('rock', 0.40900000000000003), ('hiphop', 0.169)]
 
 """
