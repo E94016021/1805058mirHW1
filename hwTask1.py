@@ -30,22 +30,34 @@ def run(genre, question):
     if question == 'q1':
         # Parallelization of the load file process
         with ProcessPoolExecutor(max_workers=4) as executor:
+            i = 0
+            f = open(question + genre + '.txt', mode='w')
             for au, sr, key in executor.map(d.__getitem__, range(d.len)):
                 key_pred = match_key(au, sr, 100)
+                print("%s   %s" % (str(d.data[i][0].strip(".au")), key_pred), file=f)
+                i += 1
                 if key == key_pred:
                     counter += 1
         acc = counter / d.len
         # print("\n", genre, "acc =", acc, "\n")
         accs.append(acc)
+        f.close()
+
     elif question == 'q3':
         # Parallelization of the load file process
         with ProcessPoolExecutor(max_workers=4) as executor:
+            i = 0
+            f = open(question + genre + '.txt', mode='w')
             for au, sr, key in executor.map(d.__getitem__, range(d.len)):
                 key_pred = match_key(au, sr, gamma=100)
+                print("%s   %s" % (str(d.data[i][0].strip(".au")), key_pred), file=f)
+                i += 1
                 counter = counter + q3_score(key, key_pred)
         acc = counter / d.len
         # print("\n", genre, "acc =", acc, "\n")
         accs.append(acc)
+        f.close()
+
     else:
         print("q# error")
 
@@ -54,12 +66,17 @@ def run_q2(genre, gamma):
     d = Data(genre)
     counter = 0  # Parallelization of the load file process
     with ProcessPoolExecutor(max_workers=4) as executor:
+        i = 0
+        f = open('q2_gamma' + str(gamma) + genre + '.txt', mode='w')
         for au, sr, key in executor.map(d.__getitem__, range(d.len)):
             key_pred = match_key(au, sr, gamma)
+            print("%s   %s" % (str(d.data[i][0].strip(".au")), key_pred), file=f)
+            i += 1
             if key == key_pred:
                 counter += 1
     acc = counter / d.len
     accs.append(acc)
+    f.close()
 
 
 def match_key(au, sr, gamma):
@@ -139,12 +156,13 @@ if __name__ == "__main__":
     questions = ['q1', 'q2', 'q3']
     gammas = [1, 10, 100, 1000]
 
-    accs = []
-    for genre in genres:
-        run(genre, 'q1')
-        mix = list(zip(genres, accs))
-    print("q1 ")
-    print(mix)
+    # accs = []
+    #
+    # for genre in genres:
+    #     run(genre, 'q1')
+    #     mix = list(zip(genres, accs))
+    # print("q1 ")
+    # print(mix)
 
     for gamma in gammas:
         accs = []
