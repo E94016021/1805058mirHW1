@@ -138,8 +138,8 @@ if __name__ == "__main__":
     genres = ['pop', 'blues', 'metal', 'rock', 'hiphop']
     questions = ['q1', 'q2', 'q3']
     gammas = [1, 10, 100, 1000]
-    accs = []
 
+    accs = []
     for genre in genres:
         run(genre, 'q1')
         mix = list(zip(genres, accs))
@@ -147,21 +147,37 @@ if __name__ == "__main__":
     print(mix)
 
     for gamma in gammas:
+        accs = []
         for genre in genres:
             run_q2(genre, gamma)
             mix = list(zip(genres, accs))
         print("q2 & gamma =", gamma)
         print(mix)
 
+    accs = []
     for genre in genres:
         run(genre, 'q3')
         mix = list(zip(genres, accs))
     print("q3 ")
     print(mix)
 
-"""
-result:
+    print("finished")
 
-[('pop', 0.16), ('blues', 0.07), ('metal', 0.05), ('rock', 0.17), ('hiphop', 0.01)]
+"""
+start
+q1 
+[('pop', 0.16), ('blues', 0.07), ('metal', 0.06), ('rock', 0.19), ('hiphop', 0.01)]
+q2 & gamma = 1
+[('pop', 0.22), ('blues', 0.05), ('metal', 0.07), ('rock', 0.27), ('hiphop', 0.04)]
+q2 & gamma = 10
+[('pop', 0.2), ('blues', 0.07), ('metal', 0.06), ('rock', 0.22), ('hiphop', 0.03)]
+q2 & gamma = 100
+[('pop', 0.16), ('blues', 0.07), ('metal', 0.06), ('rock', 0.19), ('hiphop', 0.01)]
+q2 & gamma = 1000
+[('pop', 0.16), ('blues', 0.07), ('metal', 0.05), ('rock', 0.16), ('hiphop', 0.01)]
+q3 
+[('pop', 0.29900000000000004), ('blues', 0.129), ('metal', 0.12000000000000004), ('rock', 0.32600000000000007), ('hiphop', 0.06799999999999999)]
+
+Process finished with exit code 0
 
 """
