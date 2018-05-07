@@ -25,7 +25,6 @@ def R(x: np.ndarray, y: np.ndarray):
 def run(genre, question):
     d = Data(genre)
     counter = 0
-    # print("start analyse", genre)
 
     if question == 'q1':
         # Parallelization of the load file process
@@ -39,7 +38,6 @@ def run(genre, question):
                 if key == key_pred:
                     counter += 1
         acc = counter / d.len
-        # print("\n", genre, "acc =", acc, "\n")
         accs.append(acc)
         f.close()
 
@@ -54,7 +52,6 @@ def run(genre, question):
                 i += 1
                 counter = counter + q3_score(key, key_pred)
         acc = counter / d.len
-        # print("\n", genre, "acc =", acc, "\n")
         accs.append(acc)
         f.close()
 
@@ -87,24 +84,9 @@ def match_key(au, sr, gamma):
     :return: key label
 
     """
-    ##########################################################################
-    # tonic = template.argmax()
-    # correlation = np.array([R(template[k], tonic) for k in range(24)])
-    # major = correlation[tonic]
-    # minor = correlation[tonic + 12]
-    #
-    # if major > minor:
-    #     return (correlation.argmax() + 3) % 12  # convert to gtzan key
-    # else:
-    #     return (correlation.argmax() + 3) % 12 + 12  # convert to gtzan key
-    ##########################################################################
 
     # librosa get chroma with clp
     chroma = np.log(1 + gamma * np.abs(librosa.feature.chroma_stft(y=au, sr=sr)))
-
-    # # normalize chroma
-    # chroma = chroma / np.tile(np.sum(np.abs(chroma) ** 2, axis=0) ** (1. / 2),
-    #                           (chroma.shape[0], 1))
 
     vector = np.sum(chroma, axis=1)
     ans = np.array([R(template[k], vector) for k in range(24)])
@@ -133,7 +115,6 @@ def q3_score(ans, preds):
         if p == (a + 7) % 12:
             new_accuracy += 0.5
 
-    # Relative major/minor
     if p < 12 <= a:
         a -= 12
         if p == (a + 3) % 12:
@@ -143,7 +124,6 @@ def q3_score(ans, preds):
         if (p + 3) % 12 == a:
             new_accuracy += 0.3
 
-    # Parallel major/minor
     if p == (a + 12) % 24:
         new_accuracy += 0.2
 
@@ -156,13 +136,13 @@ if __name__ == "__main__":
     questions = ['q1', 'q2', 'q3']
     gammas = [1, 10, 100, 1000]
 
-    # accs = []
-    #
-    # for genre in genres:
-    #     run(genre, 'q1')
-    #     mix = list(zip(genres, accs))
-    # print("q1 ")
-    # print(mix)
+    accs = []
+
+    for genre in genres:
+        run(genre, 'q1')
+        mix = list(zip(genres, accs))
+    print("q1 ")
+    print(mix)
 
     for gamma in gammas:
         accs = []
