@@ -25,7 +25,6 @@ def R(x: np.ndarray, y: np.ndarray):
 
 
 def run(genre, question):
-    gammas = [1, 10, 100, 1000]
     d = Data(genre)
     counter = 0
     # print("start analyse", genre)
@@ -40,18 +39,6 @@ def run(genre, question):
         acc = counter / d.len
         # print("\n", genre, "acc =", acc, "\n")
         accs.append(acc)
-    elif question == 'q2':
-        for gamma in gammas:
-            # Parallelization of the load file process
-            with ProcessPoolExecutor(max_workers=4) as executor:
-                print("gamma =", gamma)
-                for au, sr, key in executor.map(d.__getitem__, range(d.len)):
-                    key_pred = match_key(au, sr, gamma)
-                    if key == key_pred:
-                        counter += 1
-            acc = counter / d.len
-            # print("\n", genre, "acc =", acc, "\n")
-            accs.append(acc)
     elif question == 'q3':
         # Parallelization of the load file process
         with ProcessPoolExecutor(max_workers=4) as executor:
@@ -63,6 +50,19 @@ def run(genre, question):
         accs.append(acc)
     else:
         print("q# error")
+
+
+def run_q2(genre, gamma):
+    d = Data(genre)
+    counter = 0  # Parallelization of the load file process
+    with ProcessPoolExecutor(max_workers=4) as executor:
+        print("gamma =", gamma)
+        for au, sr, key in executor.map(d.__getitem__, range(d.len)):
+            key_pred = match_key(au, sr, gamma)
+            if key == key_pred:
+                counter += 1
+    acc = counter / d.len
+    accs.append(acc)
 
 
 def match_key(au, sr, gamma):
@@ -170,90 +170,30 @@ def q3_score(ans, preds):
     return new_accuracy
 
 
-# def testTime(genre, question, ):
-#     """
-#
-#     :param genre:
-#     :return:
-#     """
-#     for mw in range(1, 10):
-#         print("maxWorker =", mw, end=' ')
-#         tStart = time.time()
-#         accs = []
-#
-#         d = Data(genre)
-#         counter = 0
-#         print("start analyse", genre)
-#
-#         # Parallelization of the load file process
-#         with ProcessPoolExecutor(max_workers=mw) as executor:
-#             for au, sr, key in executor.map(d.__getitem__, range(d.len)):
-#                 key_pred = match_key(au, sr, gamma)
-#                 # print("[%d,%d]" % (key, key_pred), end=' ', flush=True)
-#                 counter = counter + q3_score(key, key_pred)
-#                 # if key == key_pred:
-#                 #     counter += 1
-#
-#         acc = counter / d.len
-#         # print("\n", genre, "acc =", acc, "\n")
-#         accs.append(acc)
-#
-#         result = list(zip(genre, accs))
-#         # print("------------------------------------------\n", result,
-#         #       "\n------------------------------------------\n")
-#         print(result)
-#         tEnd = time.time()
-#         duration = tEnd - tStart
-#
-#         print("%f sec" % (tEnd - tStart))
-#
-#     print("tResult :\n" + str(duration))
-
-
 if __name__ == "__main__":
     genres = ['pop', 'blues', 'metal', 'rock', 'hiphop']
     questions = ['q1', 'q2', 'q3']
+    gammas = [1, 10, 100, 1000]
     accs = []
-    # tStart = time.time()
 
-    # testTime('blues')
+    for genre in genres:
+        run(genre, 'q1')
+        mix = list(zip(genres, accs))
+    print("q1 ")
+    print(mix)
 
-    # f = open("file.txt", 'w')
-    # print("fuck", file=f)
-
-    for question in questions:
-        print(question)
-
+    for gamma in gammas:
         for genre in genres:
-            run(genre, question)
+            run_q2(genre, gamma)
             mix = list(zip(genres, accs))
-
+        print("q2 & gamma =", gamma)
         print(mix)
 
-    # for genre in genres:
-    #
-    #     d = Data(genre)
-    #     counter = 0
-    #     # print("start analyse", genre)
-    #
-    #     # Parallelization of the load file process
-    #     with ProcessPoolExecutor(max_workers=4) as executor:
-    #         for au, sr, key in executor.map(d.__getitem__, range(d.len)):
-    #             key_pred = match_key(au, sr, gamma)
-    #             # print("[%d,%d]" % (key, key_pred), end=' ', flush=True)
-    #             counter = counter + q3_score(key, key_pred)
-    #             # if key == key_pred:
-    #             #     counter += 1
-    #
-    #     acc = counter / d.len
-    #     # print("\n", genre, "acc =", acc, "\n")
-    #     accs.append(acc)
-
-    # result = list(zip(genres, accs))
-    # print("----------------------------------------------\n", result,
-    #       "\n------------------------------------------\n")
-    # tEnd = time.time()
-    # print("It cost %f sec" % (tEnd - tStart))
+    for genre in genres:
+        run(genre, 'q3')
+        mix = list(zip(genres, accs))
+    print("q3 ")
+    print(mix)
 
 """
 result:
